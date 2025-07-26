@@ -14,13 +14,13 @@ import android.widget.Button;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
+import androidx.activity.ComponentActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import java.io.File;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends ComponentActivity {
 
     private static final int PERMISSION_REQUEST_CODE = 100;
     private static final int MANAGE_EXTERNAL_STORAGE_REQUEST_CODE = 101;
@@ -88,14 +88,22 @@ public class MainActivity extends AppCompatActivity {
                 Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MUSIC).getAbsolutePath()
         };
 
+        // 计数器来跟踪扫描完成的路径数量
+        final int[] completedCount = {0};
+        final int totalPaths = paths.length;
+
         MediaScannerConnection.scanFile(this, paths, null,
                 new MediaScannerConnection.OnScanCompletedListener() {
                     @Override
                     public void onScanCompleted(String path, Uri uri) {
-                        runOnUiThread(() -> {
-                            Toast.makeText(MainActivity.this,
-                                    "媒体库刷新完成: " + path, Toast.LENGTH_SHORT).show();
-                        });
+                        completedCount[0]++;
+                        // 只在所有路径扫描完成后显示一次Toast
+                        if (completedCount[0] == totalPaths) {
+                            runOnUiThread(() -> {
+                                Toast.makeText(MainActivity.this,
+                                        "媒体库刷新完成", Toast.LENGTH_SHORT).show();
+                            });
+                        }
                     }
                 });
 
@@ -123,8 +131,6 @@ public class MainActivity extends AppCompatActivity {
                 e.printStackTrace();
             }
         }
-
-        Toast.makeText(this, "媒体库刷新请求已发送", Toast.LENGTH_LONG).show();
     }
 
     @Override

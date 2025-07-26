@@ -79,31 +79,17 @@ public class MainActivity extends ComponentActivity {
     private void refreshMediaLibrary() {
         Toast.makeText(this, "开始刷新媒体库...", Toast.LENGTH_SHORT).show();
 
-        // 方法1: 使用MediaScannerConnection扫描整个外部存储
-        String[] paths = {
-                Environment.getExternalStorageDirectory().getAbsolutePath(),
-                Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM).getAbsolutePath(),
-                Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES).getAbsolutePath(),
-                Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MOVIES).getAbsolutePath(),
-                Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MUSIC).getAbsolutePath()
-        };
+        // 直接扫描整个SD卡目录
+        String sdcardPath = Environment.getExternalStorageDirectory().getAbsolutePath();
 
-        // 计数器来跟踪扫描完成的路径数量
-        final int[] completedCount = {0};
-        final int totalPaths = paths.length;
-
-        MediaScannerConnection.scanFile(this, paths, null,
+        MediaScannerConnection.scanFile(this, new String[]{sdcardPath}, null,
                 new MediaScannerConnection.OnScanCompletedListener() {
                     @Override
                     public void onScanCompleted(String path, Uri uri) {
-                        completedCount[0]++;
-                        // 只在所有路径扫描完成后显示一次Toast
-                        if (completedCount[0] == totalPaths) {
-                            runOnUiThread(() -> {
-                                Toast.makeText(MainActivity.this,
-                                        "媒体库刷新完成", Toast.LENGTH_SHORT).show();
-                            });
-                        }
+                        runOnUiThread(() -> {
+                            Toast.makeText(MainActivity.this,
+                                    "媒体库刷新完成", Toast.LENGTH_SHORT).show();
+                        });
                     }
                 });
 

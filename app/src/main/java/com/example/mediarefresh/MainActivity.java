@@ -12,6 +12,7 @@ import android.provider.MediaStore;
 import android.provider.Settings;
 import android.widget.Button;
 import android.widget.Toast;
+import android.app.ProgressDialog;
 
 import androidx.annotation.NonNull;
 import androidx.activity.ComponentActivity;
@@ -79,6 +80,13 @@ public class MainActivity extends ComponentActivity {
     private void refreshMediaLibrary() {
         Toast.makeText(this, "开始刷新媒体库...", Toast.LENGTH_SHORT).show();
 
+        // 创建并显示加载对话框
+        ProgressDialog progressDialog = new ProgressDialog(this);
+        progressDialog.setTitle("正在刷新");
+        progressDialog.setMessage("正在扫描媒体文件，请稍候...");
+        progressDialog.setCancelable(false);
+        progressDialog.show();
+
         // 直接扫描整个SD卡目录
         String sdcardPath = Environment.getExternalStorageDirectory().getAbsolutePath();
 
@@ -87,6 +95,7 @@ public class MainActivity extends ComponentActivity {
                     @Override
                     public void onScanCompleted(String path, Uri uri) {
                         runOnUiThread(() -> {
+                            progressDialog.dismiss(); // 关闭对话框
                             Toast.makeText(MainActivity.this,
                                     "媒体库刷新完成", Toast.LENGTH_SHORT).show();
                         });
